@@ -46,11 +46,13 @@ async def outline_writer(research_query, state):
     if current_proposal:
         approved_sections = ""
         non_approved_sections = ""
-        for k, v in current_proposal['sections'].items():
-            if isinstance(v, dict) and v.get('approved'):
-                approved_sections += f"\"{v['title']}\", "
-            else:
-                non_approved_sections += f"\"{v['title']}\", "
+        sections = current_proposal.get('sections', {})
+        if isinstance(sections, dict):
+            for k, v in sections.items():
+                if isinstance(v, dict) and v.get('approved'):
+                    approved_sections += f"\"{v['title']}\", "
+                else:
+                    non_approved_sections += f"\"{v['title']}\", "
         # Remove trailing ", "
         approved_sections = approved_sections.rstrip(", ")
         non_approved_sections = non_approved_sections.rstrip(", ")
