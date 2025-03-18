@@ -18,7 +18,7 @@ Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies compl
 This projects uses the following tools:
 
 - [pnpm](https://pnpm.io/installation)
-- [Docker](https://docs.docker.com/get-docker/)
+- [UV](https://docs.astral.sh/uv/)
 - [Langgraph CLI](https://langchain-ai.github.io/langgraph/cloud/reference/cli/)
 
 ### 2. API Keys Needed
@@ -27,7 +27,7 @@ Running locally, you'll need the following API keys:
 - [OpenAI](https://platform.openai.com/api-keys)
 - [Tavily](https://tavily.com/#pricing)
 - [LangSmith](https://docs.smith.langchain.com/administration/how_to_guides/organization_management/create_account_api_key)
-- [CopilotKit](https://cloud.copilotkit.ai)
+- [CopilotKit](https://cloud.copilotkit.ai) (optional)
 
 ### 3. Start the Agent
 There are two main components to this project: the agent and the frontend. First, we'll start the agent.
@@ -43,18 +43,10 @@ LANGSMITH_API_KEY=your_key
 EOF
 
 ## Start the agent
-langgraph up
-
-# Note the API URL from the output (e.g., http://localhost:8123)
+uvx --refresh --from "langgraph-cli[inmem]" --with-editable . --python 3.11 langgraph dev --host localhost --port 8000
 ```
 
-### 4. Open a tunnel to your local agent
-Create a tunnel to your local agent:
-```bash
-npx copilotkit@latest dev --port 8123
-```
-
-### 5. Start the Frontend
+### 4. Start the Frontend
 Next, we'll start the frontend.
 
 ```bash
@@ -65,7 +57,7 @@ pnpm install
 cat << EOF > .env
 OPENAI_API_KEY=your_openai_key
 LANGSMITH_API_KEY=your_langsmith_key
-NEXT_PUBLIC_COPILOT_CLOUD_API_KEY=your_copilot_cloud_key
+LOCAL_DEPLOYMENT_URL=http://localhost:8000
 EOF
 
 # Start the app
