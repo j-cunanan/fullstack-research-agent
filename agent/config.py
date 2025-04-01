@@ -16,8 +16,8 @@ class Config:
         """
         Initializes the configuration for the agent
         """
-        self.BASE_LLM = ChatOpenAI(model="gpt-4", temperature=0.2)
-        self.FACTUAL_LLM = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
+        # self.BASE_LLM = ChatOpenAI(model="gpt-4", temperature=0.2)
+        # self.FACTUAL_LLM = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
         # self.BASE_LLM = AzureChatOpenAI(
         #     azure_deployment="gpt-4o-mini",  # or your deployment
         #     api_version="2024-10-21",  # or your api version

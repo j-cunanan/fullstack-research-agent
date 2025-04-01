@@ -1,11 +1,32 @@
+import os
+import httpx
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from tavily import AsyncTavilyClient
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Sequence
 from copilotkit.langchain import copilotkit_emit_state
 from langchain_core.runnables import RunnableConfig
 
-tavily_client = AsyncTavilyClient()
+class CustomAsyncTavilyClient(AsyncTavilyClient):
+        def __init__(self, api_key: Optional[str] = None, 
+                    company_info_tags: Sequence[str] = ("news", "general", "finance")):
+            if api_key is None:
+                api_key = os.getenv("TAVILY_API_KEY")
+                
+            # Skip calling parent's __init__ and implement the same logic but with verify=False
+            self._client_creator = lambda: httpx.AsyncClient(
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {api_key}"
+                },
+                base_url="https://api.tavily.com",
+                timeout=180,
+                verify=False
+            )
+            self._company_info_tags = company_info_tags
+            
+# tavily_client = AsyncTavilyClient()
+tavily_client = CustomAsyncTavilyClient()
 
 
 class TavilyExtractInput(BaseModel):

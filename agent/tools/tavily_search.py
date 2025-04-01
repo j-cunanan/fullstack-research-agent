@@ -1,4 +1,7 @@
 import asyncio
+import os
+
+import httpx
 from copilotkit.langchain import copilotkit_emit_state
 from datetime import datetime
 from dotenv import load_dotenv
@@ -6,11 +9,30 @@ import json
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from tavily import AsyncTavilyClient
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Sequence
 from langchain_core.runnables import RunnableConfig
 load_dotenv('.env')
-tavily_client = AsyncTavilyClient()
 
+class CustomAsyncTavilyClient(AsyncTavilyClient):
+        def __init__(self, api_key: Optional[str] = None, 
+                    company_info_tags: Sequence[str] = ("news", "general", "finance")):
+            if api_key is None:
+                api_key = os.getenv("TAVILY_API_KEY")
+                
+            # Skip calling parent's __init__ and implement the same logic but with verify=False
+            self._client_creator = lambda: httpx.AsyncClient(
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {api_key}"
+                },
+                base_url="https://api.tavily.com",
+                timeout=180,
+                verify=False
+            )
+            self._company_info_tags = company_info_tags
+            
+# tavily_client = AsyncTavilyClient()
+tavily_client = CustomAsyncTavilyClient()
 # Add Tavily's arguments to enhance the web search tool's capabilities
 class TavilyQuery(BaseModel):
     query: str = Field(description="Web search query")
